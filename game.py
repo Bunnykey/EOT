@@ -132,9 +132,6 @@ class Game(object):
         return map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass)
         # print('\n'.join(str(p) for p in  list(map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass))))
 
-    """
-    league : 
-    """
     def league(self):
         for i in self.lineUp:
             for n in range(self.option.rounds):
@@ -159,11 +156,16 @@ class Visualizer:
     def Visualize(Game):
         G = nx.Graph()
         G.add_nodes_from(Game.Playerlist)
-        print(Game.lineUp)
-        G.add_edges_from(Game.lineUp)
+        for i in range(len(Game.Playerlist)):
+            for j in range(i+1,len(Game.Playerlist)):
+                G.add_edge(i, j)
         nx.draw_circular(G,with_labels=False)
-        plt.show()
-        return 0
+        pos = nx.circular_layout(G)
+
+        for i in range(100):
+            plt.pause(0.5)
+            nx.draw_circular(G,with_labels=False)
+            plt.draw()
 
 class Verifier:
     @staticmethod
@@ -193,21 +195,22 @@ class Verifier:
 #######################################################################################
 #CONSTRUCTION AREA
 #######################################################################################
-# gameInstance = Game(
-#     PlayerTypes=[2, 2, 2, 2, 2],
-#         Option=Game.Option(
-#             reward={
-#                 'BothBetray': 0,
-#                 'BothHelp': 2,
-#                 'BetrayBenefit': 3,
-#                 'HelpPenalty': -1},
-#             rounds=10,
-#             leagueLoop=30,
-#             mutationWeight=5))
+gameInstance = Game(
+    PlayerTypes=[2, 2, 2, 2, 2],
+        Option=Game.Option(
+            reward={
+                'BothBetray': 0,
+                'BothHelp': 2,
+                'BetrayBenefit': 3,
+                'HelpPenalty': -1},
+            rounds=10,
+            leagueLoop=30,
+            mutationWeight=5))
 
 Verifier.verify()
 
-# gameInstance.leagueStart() 
-# #시작 버튼을 누르면 실행
-# gameInstance.monitor() 
+gameInstance.leagueStart() 
+#시작 버튼을 누르면 실행
+gameInstance.monitor() 
+Visualizer.Visualize(gameInstance)
 #결과를 보고 싶습니다
