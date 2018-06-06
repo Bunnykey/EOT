@@ -121,14 +121,15 @@ class Game(object):
 
     def mutation(self):
         self.Playerlist.sort(key=lambda x: x.score, reverse=True)
-        for i in range(self.option.mutationWeight):
-            self.Playerlist.insert(0,type(self.Playerlist[i])())
+        
         for i in range(self.option.mutationWeight):
             self.Playerlist.pop()
+        for i in range(self.option.mutationWeight):
+            self.Playerlist.append(type(self.Playerlist[i])())
         
     #don't touch, it's magic
     def monitor(self):
-        return list(map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass))
+        return map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass)
         # print('\n'.join(str(p) for p in  list(map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass))))
 
     """
@@ -137,7 +138,7 @@ class Game(object):
     def league(self):
         for i in self.lineUp:
             for n in range(self.option.rounds):
-                self.Battle(list(map(lambda x:self.Playerlist[x],i)))
+                self.Battle(map(lambda x:self.Playerlist[x],i))
                 for j in range(2):
                     if isinstance(self.Playerlist[i[j]],ReactPlayer):
                         self.Playerlist[i[j]].update(True)

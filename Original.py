@@ -63,12 +63,10 @@ class Game(object):
         for i in range(0, 5):
             for j in range(0, PlayerTypes[i]):
                 self.Playerlist.append(self.PlayerClass[i]())
-        lineUp = []
+        self.lineUp = []
         for i in range(0,self.Playerlist.__len__()):
             for j in range(i+1,self.Playerlist.__len__()):
-                lineUp.append((i,j))
-        
-        
+                self.lineUp.append((i,j))
 
     class Option(object):
         def __init__(self,reward,rounds,leagueLoop):
@@ -117,6 +115,9 @@ class Game(object):
             self.Playerlist.append(type(self.Playerlist[i])())
             
     def monitor(self):
+        
+        return list(map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass))
+
         winnerList = []
         winnerCount = []
         for i in self.Playerlist:
@@ -149,17 +150,41 @@ class Game(object):
             self.league()
             
     
+class Verifier:
+
+    @staticmethod
+    def verify():
+        testSet = [[2,10,2,11,0],[2,10,11,2,0],[2,2,11,10,0],[1,20,3,1,0],[10,6,9,0,0],[8,0,9,8,0]]
+        testResult = ["Revenger","Mirror","Revenger","Mirror","Mirror","OnlyHelper"]
+        counter = 0
+        for i in range(len(testSet)):
+            print("----------------------")
+            g = Game(
+                PlayerTypes=testSet[i],
+                Option=Game.Option(
+                    reward={
+                        'BothBetray': 0,
+                        'BothHelp': 2,
+                        'BetrayBenefit': 3,
+                        'HelpPenalty': -1},
+                    rounds=10,
+                    leagueLoop=50))
+            g.leagueStart()
+            simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
+            counter+=int(simResult[0][0] ==testResult[i])
+        print(str((counter*100)/len(testSet))+"%")
+        return True
+
+Verifier.verify()
     
 
-    
+# gameInstance = Game(PlayerTypes=[20,20,20,20,20],
+#                     Option=Game.Option(
+#                         reward={'BothBetray':0,'BothHelp':2,'BetrayBenefit':3,'HelpPenalty':-1},
+#                         rounds =1,
+#                         leagueLoop=5))
 
-gameInstance = Game(PlayerTypes=[20,20,20,20,20],
-                    Option=Game.Option(
-                        reward={'BothBetray':0,'BothHelp':2,'BetrayBenefit':3,'HelpPenalty':-1},
-                        rounds =1,
-                        leagueLoop=5))
-
- #시작 버튼을 누르면 실행
-gameInstance.leagueStart()
-#결과를 보고 싶습니다
-gameInstance.monitor() 
+#  #시작 버튼을 누르면 실행
+# gameInstance.leagueStart()
+# #결과를 보고 싶습니다
+# gameInstance.monitor() 
