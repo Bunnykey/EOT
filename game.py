@@ -152,19 +152,36 @@ class Game(object):
 #######################################################################################
 
 class Visualizer:
-    @staticmethod
-    def Visualize(Game):
-        G = nx.Graph()
-        G.add_nodes_from(Game.Playerlist)
+    def __init__(self):
+        self.G = nx.Graph()
+        self.updateData()
+
+    def updateData(self,Game):
+        color_dict = {
+            "Mirror": "green",
+            "Randomer": "pink",
+            "Revenger":"yellow",
+            "OnlyBetrayer":"red","OnlyHelper":"blue"}
+        # playerCollection = map(lambda x:map(lambda y:))
+
+        # for i in range(len(Game.PlayerClass)):
+            
+
+        
+        self.G.add_nodes_from(Game.Playerlist)
         for i in range(len(Game.Playerlist)):
             for j in range(i+1,len(Game.Playerlist)):
-                G.add_edge(i, j)
-        nx.draw_circular(G,with_labels=False)
-        pos = nx.circular_layout(G)
-
+                self.G.add_edge(i, j)
+        nx.draw_circular(self.G,with_labels=False)
+        pos = nx.circular_layout(self.G)
+    
+    
+    def Visualize(self,Game):
         for i in range(100):
             plt.pause(0.5)
-            nx.draw_circular(G,with_labels=False)
+            nx.draw_circular(self.G,with_labels=False)
+            #some kinda data update needed for every frame, which could be league()
+            self.updateData(Game)
             plt.draw()
 
 class Verifier:
@@ -189,7 +206,7 @@ class Verifier:
             g.leagueStart()
             simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
             counter+=int(simResult[0][0] ==testResult[i])
-        print(str((counter*100)/len(testSet))+"%")
+        print("verify result:"+str((counter*100)/len(testSet))+"%")
         return True
 
 #######################################################################################
