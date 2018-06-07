@@ -79,7 +79,7 @@ class Randomer(Player):
         Player.__init__(self)
 
     def algorithm(self):
-        return bool(random.randint(0, 1))  ### bool타입 활용 (bool(1) = True, bool(0)= False))
+        return random.choice([True, False])  ### bool타입 활용 (bool(1) = True, bool(0)= False))
 
 class Game(object):
     def __init__(self, PlayerTypes, Option):
@@ -129,14 +129,40 @@ class Game(object):
         for i in range(2):
             match[i].score+= self.option.reward[result][i]
 
+    @staticmethod
+    def getNRandomItemsFromList(inputList,targetValue,pickAmount):
+        
+        print map(lambda y:inputList.index(y),filter(lambda x:x.score==targetValue,inputList))
+        return random.sample(map(lambda y:inputList.index(y),filter(lambda x:x.score==targetValue,inputList)),pickAmount)            
+
     def mutation(self):
-        self.Playerlist.sort(key=lambda x: x.score, reverse=True)
+        self.Playerlist.sort(key=lambda x: x.score, reverse=True)  ### 최하위 동점자 무작위 탈락 구현하기
+
+        minValue = min(map(lambda x:x.score,self.Playerlist))
+        minCount = sum(x.score==minValue for x in self.Playerlist)
+
+        maxValue = max(map(lambda x:x.score,self.Playerlist))
+        maxCount = sum(x.score==maxValue for x in self.Playerlist)
         
-        for i in range(self.option.mutationWeight):
-            self.Playerlist.pop()
-        for i in range(self.option.mutationWeight):
-            self.Playerlist.append(type(self.Playerlist[i])())
         
+        if minCount>self.option.mutationWeight:
+            minlist = Game.getNRandomItemsFromList(self.Playerlist,minValue,self.option.mutationWeight)
+            minlist.sort(key=lambda x:x, reverse=True)
+            for i in minlist:
+                self.Playerlist.pop(i-minlist.index(i))
+        else:
+            for i in range(self.option.mutationWeight):
+                self.Playerlist.pop()
+            
+        if maxCount>self.option.mutationWeight:
+            maxlist = Game.getNRandomItemsFromList(self.Playerlist,maxValue,self.option.mutationWeight)
+            for i in maxlist:
+                self.Playerlist.append(type(self.Playerlist[i])())
+        else:
+            for i in range(self.option.mutationWeight):
+                self.Playerlist.append(type(self.Playerlist[i])())
+
+          
     #don't touch, it's magic
     def monitor(self):
         return map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass)
@@ -150,12 +176,15 @@ class Game(object):
                 if isinstance(self.Playerlist[i[j]],ReactPlayer):
                     self.Playerlist[i[j]].resetPrevEnemyAction()
         self.mutation()
+        print(map(lambda x:x.score,self.Playerlist))
         map(lambda x: x.scoreReset(), self.Playerlist)
+        
 
     def leagueStart(self):
         for i in range(self.option.leagueLoop):
-            plt.pause(0.5)
+            plt.pause(0.1)
             self.league()
+            # print(self.monitor())
             self.visualizer.updateData()
             self.visualizer.Visualize()
 
@@ -193,7 +222,6 @@ class Verifier:
         testResult = ["Revenger","Mirror","Revenger","Mirror","Mirror","OnlyHelper"]
         counter = 0
         for i in range(len(testSet)):
-            
             g = Game(
                 PlayerTypes=testSet[i],
                 Option=Game.Option(
@@ -216,7 +244,7 @@ class Verifier:
 
 
 gameInstance = Game(
-    PlayerTypes=[2, 2, 2, 2, 2],
+    PlayerTypes=[4, 4, 13, 4, 0],
         Option=Game.Option(
             reward={
                 'BothBetray': 0,
@@ -228,7 +256,7 @@ gameInstance = Game(
             mutationWeight=5,
             mistake=0
             ))
-            
-Verifier.verify()
-# gameInstance.leagueStart() 
+
+#Verifier.verify()
+gameInstance.leagueStart() 
 # gameInstance.monitor() 
