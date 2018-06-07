@@ -46,6 +46,9 @@ class ReactPlayer(Player):  ### 상대의 행동에 영향받는 플레이어의
         Player.__init__(self)
         self.prevEnemyAction = True
 
+    def resetPrevEnemyAction(self):
+        self.prevEnemyAction=True
+
     def update(self, input):
         raise NotImplementedError
 
@@ -136,9 +139,9 @@ class Game(object):
         for i in self.lineUp:
             for n in range(self.option.rounds):
                 self.Battle(map(lambda x:self.Playerlist[x],i))
-                for j in range(2):
-                    if isinstance(self.Playerlist[i[j]],ReactPlayer):
-                        self.Playerlist[i[j]].update(True)
+            for j in range(2):
+                if isinstance(self.Playerlist[i[j]],ReactPlayer):
+                    self.Playerlist[i[j]].resetPrevEnemyAction()
         self.mutation()
         map(lambda x: x.scoreReset(), self.Playerlist)
 
@@ -191,7 +194,7 @@ class Verifier:
         testResult = ["Revenger","Mirror","Revenger","Mirror","Mirror","OnlyHelper"]
         counter = 0
         for i in range(len(testSet)):
-            print("----------------------")
+            
             g = Game(
                 PlayerTypes=testSet[i],
                 Option=Game.Option(
@@ -205,6 +208,8 @@ class Verifier:
                     mutationWeight=5))
             g.leagueStart()
             simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
+            print("----------------------")
+            print(simResult[0][0] ==testResult[i])
             counter+=int(simResult[0][0] ==testResult[i])
         print("verify result:"+str((counter*100)/len(testSet))+"%")
         return True
@@ -229,5 +234,5 @@ Verifier.verify()
 gameInstance.leagueStart() 
 #시작 버튼을 누르면 실행
 gameInstance.monitor() 
-Visualizer.Visualize(gameInstance)
+# Visualizer.Visualize(gameInstance)
 #결과를 보고 싶습니다
