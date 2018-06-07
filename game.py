@@ -27,6 +27,16 @@ class Player(object):
     def areTheyFriends(match):
         return (match[0].friendKey==match[1].friendKey) and (match[0].friendKey!=None)
 
+    def mistake(self): 
+        mistakeRate = random.randint(1,100) 
+
+        if mistakeRate <= self.mistakePr: 
+            self.algorithm = bool((self.alogrithm + 1)%2) 
+            return self.algorithm 
+         
+        else: 
+             return self.algorithm 
+
 
 class OnlyHelper(Player):
     def __init__(self):
@@ -159,11 +169,9 @@ class Game(object):
 class Visualizer:
     def __init__(self,Game):
         self.G = nx.Graph()
-<<<<<<< HEAD
-=======
         self.gameInstance = Game
         self.updateData()
->>>>>>> master
+
 
     def updateData(self):
         color_dict = {
@@ -171,22 +179,13 @@ class Visualizer:
             "Randomer": "pink",
             "Revenger":"yellow",
             "OnlyBetrayer":"red","OnlyHelper":"blue"}
-        playerCollection = list(map(lambda x:color_dict[x.__name__],Game.Playerlist))
+        playerCollection = list(map(lambda x:color_dict[type(x)],self.gameInstance.Playerlist))
         # playerCollection = list(tuple(list(),string))
         print playerCollection            
 
-        
-<<<<<<< HEAD
-
-
-        self.G.add_nodes_from(Game.Playerlist)
-        for i in range(len(Game.Playerlist)):
-            for j in range(i+1,len(Game.Playerlist)):
-=======
         self.G.add_nodes_from(self.gameInstance.Playerlist)
         for i in range(len(self.gameInstance.Playerlist)):
             for j in range(i+1,len(self.gameInstance.Playerlist)):
->>>>>>> master
                 self.G.add_edge(i, j)
         nx.draw_circular(self.G,with_labels=False)
         pos = nx.circular_layout(self.G)
@@ -220,7 +219,7 @@ class Verifier:
                     leagueLoop=50,
                     mutationWeight=5))
             g.leagueStart()
-            simResult = sorted(g.monitor(),key=lam      bda x: x[1], reverse=True)
+            simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
             print("----------------------")
             print(simResult[0][0] ==testResult[i])
             counter+=int(simResult[0][0] ==testResult[i])
