@@ -27,6 +27,16 @@ class Player(object):
     def areTheyFriends(match):
         return (match[0].friendKey==match[1].friendKey) and (match[0].friendKey!=None)
 
+    def mistake(self):
+        mistakeRate = random.randint(1,100)
+        if mistakeRate <= self.mistakePr:
+            self.algorithm = bool((self.alogrithm + 1)%2)
+        return self.algorithm
+        
+        else:
+            pass
+
+
 class OnlyHelper(Player):
     def __init__(self):
         Player.__init__(self)
@@ -105,6 +115,7 @@ class Game(object):
                 (reward['BothHelp'],reward['BothHelp'])]
             self.leagueLoop = leagueLoop
             self.mutationWeight=mutationWeight
+            self.mistakePr = mistakePr
 
     @staticmethod  #호출된 클래스나 인스턴스에 대해 모르는 메소드
     def Validate(match):
@@ -167,7 +178,8 @@ class Visualizer:
             "Randomer": "pink",
             "Revenger":"yellow",
             "OnlyBetrayer":"red","OnlyHelper":"blue"}
-        # playerCollection = map(lambda x:map(lambda y:))
+        playerCollection = list(map(lambda x:color_dict[str(type(x))],self.Playerlist))
+        # playerCollection = list(tuple(list(),string))
 
         # for i in range(len(Game.PlayerClass)):
             
@@ -183,7 +195,7 @@ class Visualizer:
     
     def Visualize(self,Game):
         for i in range(100):
-            plt.pause(0.5)
+            plt.pause(0.5) # refresh delay
             nx.draw_circular(self.G,with_labels=False)
             #some kinda data update needed for every frame, which could be league()
             self.updateData()
@@ -229,7 +241,9 @@ gameInstance = Game(
                 'HelpPenalty': -1},
             rounds=10,
             leagueLoop=30,
-            mutationWeight=5))
+            mutationWeight=5
+            mistakePr=5
+            ))
 
 Verifier.verify()
 
