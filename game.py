@@ -94,6 +94,7 @@ class Game(object):
         for i in range(len(self.Playerlist)):
             for j in range(i + 1, len(self.Playerlist)):
                 self.lineUp.append((i, j))
+        self.visualizer = Visualizer(self)
         #print(self.lineUp)
 
     class Option(object):
@@ -156,10 +157,15 @@ class Game(object):
 #######################################################################################
 
 class Visualizer:
-    def __init__(self):
+    def __init__(self,Game):
         self.G = nx.Graph()
+<<<<<<< HEAD
+=======
+        self.gameInstance = Game
+        self.updateData()
+>>>>>>> master
 
-    def updateData(self,Game):
+    def updateData(self):
         color_dict = {
             "Mirror": "green",
             "Randomer": "pink",
@@ -170,11 +176,17 @@ class Visualizer:
         print playerCollection            
 
         
+<<<<<<< HEAD
 
 
         self.G.add_nodes_from(Game.Playerlist)
         for i in range(len(Game.Playerlist)):
             for j in range(i+1,len(Game.Playerlist)):
+=======
+        self.G.add_nodes_from(self.gameInstance.Playerlist)
+        for i in range(len(self.gameInstance.Playerlist)):
+            for j in range(i+1,len(self.gameInstance.Playerlist)):
+>>>>>>> master
                 self.G.add_edge(i, j)
         nx.draw_circular(self.G,with_labels=False)
         pos = nx.circular_layout(self.G)
@@ -185,7 +197,7 @@ class Visualizer:
             plt.pause(0.5) # refresh delay
             nx.draw_circular(self.G,with_labels=False)
             #some kinda data update needed for every frame, which could be league()
-            self.updateData(Game)
+            self.updateData()
             plt.draw()
 
 class Verifier:
@@ -208,7 +220,7 @@ class Verifier:
                     leagueLoop=50,
                     mutationWeight=5))
             g.leagueStart()
-            simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
+            simResult = sorted(g.monitor(),key=lam      bda x: x[1], reverse=True)
             print("----------------------")
             print(simResult[0][0] ==testResult[i])
             counter+=int(simResult[0][0] ==testResult[i])
