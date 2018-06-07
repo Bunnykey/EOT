@@ -98,7 +98,7 @@ class Game(object):
         #print(self.lineUp)
 
     class Option(object):
-        def __init__(self, reward, rounds, leagueLoop,mutationWeight):
+        def __init__(self, reward, rounds, leagueLoop,mutationWeight,mistake):
             self.rounds = rounds
             self.reward = [(reward['BothBetray'],reward['BothBetray']),
                 (reward['HelpPenalty'],reward['BetrayBenefit']),
@@ -106,21 +106,26 @@ class Game(object):
                 (reward['BothHelp'],reward['BothHelp'])]
             self.leagueLoop = leagueLoop
             self.mutationWeight=mutationWeight
+            self.mistake = mistake/100.0
 
+    @staticmethod
+    def mistakeActions(input,missRate):
+        return input and (random.random()>missRate)
+        
     @staticmethod  #호출된 클래스나 인스턴스에 대해 모르는 메소드
-    def Validate(match):
+    def Validate(match,mistake):
         if Player.areTheyFriends(match):
             return 3
 
         params = [match[0], match[1]]
-        res = list(map(lambda x: x.algorithm(), params))
+        res = list(map(lambda x: Game.mistakeActions(x.algorithm(),mistake), params))
         for i in range(2):
             if isinstance(params[i],ReactPlayer):
                 params[i].update(res[(i + 1) % 2])
         return int(res[0])+(int(res[1])*2)
 
     def Battle(self, match):
-        result = Game.Validate(match)
+        result = Game.Validate(match,self.option.mistake)
         for i in range(2):
             match[i].score+= self.option.reward[result][i]
 
@@ -159,11 +164,8 @@ class Game(object):
 class Visualizer:
     def __init__(self,Game):
         self.G = nx.Graph()
-<<<<<<< HEAD
-=======
         self.gameInstance = Game
         self.updateData()
->>>>>>> master
 
     def updateData(self):
         color_dict = {
@@ -171,28 +173,18 @@ class Visualizer:
             "Randomer": "pink",
             "Revenger":"yellow",
             "OnlyBetrayer":"red","OnlyHelper":"blue"}
-        playerCollection = list(map(lambda x:color_dict[x.__name__],Game.Playerlist))
-        # playerCollection = list(tuple(list(),string))
-        print playerCollection            
-
+        playerCollection = list(map(lambda x:color_dict[type(x).__name__],self.gameInstance.Playerlist))        
         
-<<<<<<< HEAD
 
-
-        self.G.add_nodes_from(Game.Playerlist)
-        for i in range(len(Game.Playerlist)):
-            for j in range(i+1,len(Game.Playerlist)):
-=======
-        self.G.add_nodes_from(self.gameInstance.Playerlist)
+        self.G.add_nodes_from(self.gameInstance.Playerlist, color=playerCollection)
         for i in range(len(self.gameInstance.Playerlist)):
             for j in range(i+1,len(self.gameInstance.Playerlist)):
->>>>>>> master
                 self.G.add_edge(i, j)
         nx.draw_circular(self.G,with_labels=False)
         pos = nx.circular_layout(self.G)
     
     
-    def Visualize(self,Game):
+    def Visualize(self):
         for i in range(100):
             plt.pause(0.5) # refresh delay
             nx.draw_circular(self.G,with_labels=False)
@@ -218,9 +210,10 @@ class Verifier:
                         'HelpPenalty': -1},
                     rounds=10,
                     leagueLoop=50,
-                    mutationWeight=5))
+                    mutationWeight=5,
+                    mistake=0))
             g.leagueStart()
-            simResult = sorted(g.monitor(),key=lam      bda x: x[1], reverse=True)
+            simResult = sorted(g.monitor(),key=lambda x: x[1], reverse=True)
             print("----------------------")
             print(simResult[0][0] ==testResult[i])
             counter+=int(simResult[0][0] ==testResult[i])
@@ -241,14 +234,16 @@ gameInstance = Game(
             rounds=10,
             leagueLoop=30,
             mutationWeight=5,
+            mistake=0
             ))
 
-Verifier.verify()
+#Verifier.verify()
 
 gameInstance.leagueStart() 
 #시작 버튼을 누르면 실행
 gameInstance.monitor() 
 # Visualizer.Visualize(gameInstance)
 #결과를 보고 싶습니다
-visualInstance = Visualizer()
-visualInstance.updateData(gameInstance)
+visualInstance = Visualizer(gameInstance)
+#visualInstance.updateData(gameInstance)
+visualInstance.Visualize()
