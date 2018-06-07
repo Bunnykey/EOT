@@ -150,9 +150,11 @@ class Game(object):
             for i in range(self.option.mutationWeight):
                 self.Playerlist.append(type(self.Playerlist[i])())
           
+    def printPlayerScores(self):
+        print '\n'.join(str(s) for s in map(lambda x:(type(x).__name__,x.score),self.Playerlist))
     #don't touch, it's magic
     def monitor(self):
-        #print('\n'.join(str(p) for p in  list(map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass))))
+        #print('\n'.join(str(p) for p in  map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass)))
         return map(lambda x:(x.__name__,sum(isinstance(y,x) for y in self.Playerlist)),self.PlayerClass)
 
     def league(self):
@@ -163,6 +165,7 @@ class Game(object):
                 if isinstance(self.Playerlist[i[j]],ReactPlayer):
                     self.Playerlist[i[j]].resetPrevEnemyAction()
         self.mutation()
+        #self.printPlayerScores()
         map(lambda x: x.scoreReset(), self.Playerlist)
 
     def leagueStart(self):
@@ -231,4 +234,4 @@ gameInstance = Game(
             mistake=0))
 #Verifier.verify()
 gameInstance.leagueStart() 
-#gameInstance.monitor() ##shows instance name, 
+#gameInstance.monitor() ##shows instance name
