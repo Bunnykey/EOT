@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 ####################################
-# Please! Do not try this at home. #
+# One liter americano with 4 shots #
 ####################################
 #something file changed here
 import random
@@ -154,43 +154,37 @@ class Game(object):
 
     def leagueStart(self):
         for i in range(self.option.leagueLoop):
+            plt.pause(0.5)
             self.league()
-            #Visualizer.Visualize(self)
-
-#######################################################################################
-#CONSTRUCTION AREA
-#######################################################################################
+            self.visualizer.updateData()
+            self.visualizer.Visualize()
 
 class Visualizer:
     def __init__(self,Game):
-        self.G = nx.Graph()
         self.gameInstance = Game
-        self.updateData()
-
-    def updateData(self):
-        color_dict = {
+        self.G = nx.cycle_graph(len(self.gameInstance.Playerlist))
+        self.pos = nx.circular_layout(self.G)
+        cf = plt.figure(figsize=(1,1),dpi=512)
+        cf.add_axes((0,0,1,1))
+        self.color_dict = {
             "Mirror": "green",
             "Randomer": "pink",
             "Revenger":"yellow",
-            "OnlyBetrayer":"red","OnlyHelper":"blue"}
-        playerCollection = list(map(lambda x:color_dict[type(x).__name__],self.gameInstance.Playerlist))        
+            "OnlyBetrayer":"red",
+            "OnlyHelper":"blue"}
+        for i in self.G.edges():
+            self.G[i[0]][i[1]]['draw'] = nx.draw_networkx_edges(self.G,self.pos,edgelist=[i],alpha=0.5,arrows=False,width=1)
         
+        
+        self.updateData()
 
-        self.G.add_nodes_from(self.gameInstance.Playerlist, color=playerCollection)
-        for i in range(len(self.gameInstance.Playerlist)):
-            for j in range(i+1,len(self.gameInstance.Playerlist)):
-                self.G.add_edge(i, j)
-        nx.draw_circular(self.G,with_labels=False)
-        pos = nx.circular_layout(self.G)
-    
+    def updateData(self):
+        for j in range(len(self.gameInstance.Playerlist)):
+            self.G.node[j]['draw'] = nx.draw_networkx_nodes(self.G,self.pos,nodelist=[j],with_labels=False,node_size=20,node_color=self.color_dict[type(self.gameInstance.Playerlist[j]).__name__])
+        
     
     def Visualize(self):
-        for i in range(100):
-            plt.pause(0.5) # refresh delay
-            nx.draw_circular(self.G,with_labels=False)
-            #some kinda data update needed for every frame, which could be league()
-            self.updateData()
-            plt.draw()
+        plt.draw()
 
 class Verifier:
     @staticmethod
@@ -220,9 +214,7 @@ class Verifier:
         print("verify result:"+str((counter*100)/len(testSet))+"%")
         return True
 
-#######################################################################################
-#CONSTRUCTION AREA
-#######################################################################################
+
 gameInstance = Game(
     PlayerTypes=[2, 2, 2, 2, 2],
         Option=Game.Option(
@@ -236,14 +228,7 @@ gameInstance = Game(
             mutationWeight=5,
             mistake=0
             ))
-
-#Verifier.verify()
-
-gameInstance.leagueStart() 
-#시작 버튼을 누르면 실행
-gameInstance.monitor() 
-# Visualizer.Visualize(gameInstance)
-#결과를 보고 싶습니다
-visualInstance = Visualizer(gameInstance)
-#visualInstance.updateData(gameInstance)
-visualInstance.Visualize()
+            
+Verifier.verify()
+# gameInstance.leagueStart() 
+# gameInstance.monitor() 
