@@ -27,15 +27,6 @@ class Player(object):
     def areTheyFriends(match):
         return (match[0].friendKey==match[1].friendKey) and (match[0].friendKey!=None)
 
-    def mistake(self):
-        mistakeRate = random.randint(1,100)
-        if mistakeRate <= self.mistakePr:
-            self.algorithm = bool((self.alogrithm + 1)%2)
-        return self.algorithm
-        
-        else:
-            pass
-
 
 class OnlyHelper(Player):
     def __init__(self):
@@ -57,7 +48,7 @@ class ReactPlayer(Player):  ### 상대의 행동에 영향받는 플레이어의
         self.prevEnemyAction = True
 
     def resetPrevEnemyAction(self):
-        self.prevEnemyAction=True
+        self.prevEnemyAction = True
 
     def update(self, input):
         raise NotImplementedError
@@ -114,7 +105,6 @@ class Game(object):
                 (reward['BothHelp'],reward['BothHelp'])]
             self.leagueLoop = leagueLoop
             self.mutationWeight=mutationWeight
-            self.mistakePr = mistakePr
 
     @staticmethod  #호출된 클래스나 인스턴스에 대해 모르는 메소드
     def Validate(match):
@@ -168,7 +158,6 @@ class Game(object):
 class Visualizer:
     def __init__(self):
         self.G = nx.Graph()
-        self.updateData()
 
     def updateData(self,Game):
         color_dict = {
@@ -176,13 +165,13 @@ class Visualizer:
             "Randomer": "pink",
             "Revenger":"yellow",
             "OnlyBetrayer":"red","OnlyHelper":"blue"}
-        playerCollection = list(map(lambda x:color_dict[str(type(x))],self.Playerlist))
+        playerCollection = list(map(lambda x:color_dict[x.__name__],Game.Playerlist))
         # playerCollection = list(tuple(list(),string))
-
-        # for i in range(len(Game.PlayerClass)):
-            
+        print playerCollection            
 
         
+
+
         self.G.add_nodes_from(Game.Playerlist)
         for i in range(len(Game.Playerlist)):
             for j in range(i+1,len(Game.Playerlist)):
@@ -239,8 +228,7 @@ gameInstance = Game(
                 'HelpPenalty': -1},
             rounds=10,
             leagueLoop=30,
-            mutationWeight=5
-            mistakePr=5
+            mutationWeight=5,
             ))
 
 Verifier.verify()
@@ -250,3 +238,5 @@ gameInstance.leagueStart()
 gameInstance.monitor() 
 # Visualizer.Visualize(gameInstance)
 #결과를 보고 싶습니다
+visualInstance = Visualizer()
+visualInstance.updateData(gameInstance)
