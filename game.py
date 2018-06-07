@@ -30,7 +30,9 @@ class Player(object):
     def mistake(self):
         mistakeRate = random.randint(1,100)
         if mistakeRate <= self.mistakePr:
-            self.algorithm = bool((self.alogrithm) + 1 % 2)
+            self.algorithm = bool((self.alogrithm + 1)%2)
+        return self.algorithm
+        
         else:
             pass
 
